@@ -1,7 +1,9 @@
 // The list of syscalls is taken from x32, which contains a sensible list of
 // "modern" syscalls.
 
-#define SYSCALL_ACTION(x) long __syscall_##x(long arg1, ...);
+#define SYSCALL_ACTION(x) \
+  long __syscall_##x(long arg1, long arg2, long arg3, \
+                     long arg4, long arg5, long arg6);
 #include "syscall_list.h"
 #undef SYSCALL_ACTION
 

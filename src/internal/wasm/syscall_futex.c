@@ -1,5 +1,4 @@
 #include <futex.h>
-#include <stdarg.h>
 #include <errno.h>
 #include "syscall.h"
 
@@ -9,20 +8,17 @@
 // For now, Wasm is single-threaded and we simply assert that the lock is not
 // held, and abort if a wait would be required (assume it's a corrupted lock).
 
-long __syscall_futex(long arg1, ...)
+long __syscall_futex(long arg1, long arg2, long arg3,
+                     long arg4, long arg5, long arg6)
 {
-	va_list va;
-	va_start(va, arg1);
-
 	volatile int* addr = (volatile int*)arg1;
-	long op = va_arg(va, long);
+	long op = arg2;
 
 	op &= ~FUTEX_PRIVATE;
 
 	if (op == FUTEX_WAIT) {
-		int val = (int)va_arg(va, long);
+		int val = (int)arg3;
 		// arg4 would be the timeout as a timespec*
-		va_end(va);
 
 		if (*addr == val) {
 			// trap, Wasm can't block
@@ -33,13 +29,11 @@ long __syscall_futex(long arg1, ...)
 	}
 	if (op == FUTEX_WAKE) {
 		// arg3 would be the number of waiters to wake as an int
-		va_end(va);
 
 		// Wasm can't block/wait
 		// TODO use a WebAssembly futex builtin, when those arrive!
 		return 0;
 	}
 
-	va_end(va);
 	return -ENOSYS;
 }

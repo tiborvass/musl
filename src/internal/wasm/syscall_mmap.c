@@ -2,7 +2,6 @@
 
 #include <errno.h>
 #include <limits.h>
-#include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
 #include <sys/mman.h>
@@ -182,18 +181,12 @@ static int used_pages_test_mapped(void* addr, size_t length)
 }
 
 
-long __syscall_madvise(long arg1, ...)
+long __syscall_madvise(long arg1, long arg2, long arg3,
+                       long arg4, long arg5, long arg6)
 {
-	void* addr;
-	size_t length;
-	int advice;
-	va_list va;
-
-	addr = (void*)arg1;
-	va_start(va, arg1);
-	length = (size_t)va_arg(va, long);
-	advice = (int)va_arg(va, long);
-	va_end(va);
+	void* addr = (void*)arg1;
+	size_t length = (size_t)arg2;
+	int advice = (int)arg3;
 
 	/* Check for one of the advisory-only flags before saying
 	 * that we succeeded! */
@@ -221,22 +214,15 @@ long __syscall_madvise(long arg1, ...)
 	return 0;
 }
 
-long __syscall_mmap(long arg1, ...)
+long __syscall_mmap(long arg1, long arg2, long arg3,
+                    long arg4, long arg5, long arg6)
 {
-	void* addr;
-	size_t length;
-	int prot, flags, fd;
-	off_t offset;
-	va_list va;
-
-	addr = (void*)arg1;
-	va_start(va, arg1);
-	length = (size_t)va_arg(va, long);
-	prot = (int)va_arg(va, long);
-	flags = (int)va_arg(va, long);
-	fd = (int)va_arg(va, long);
-	offset = (off_t)va_arg(va, long);
-	va_end(va);
+	void* addr = (void*)arg1;
+	size_t length = (size_t)arg2;
+	int prot = (int)arg3;
+	int flags = (int)arg4;
+	int fd = (int)arg5;
+	off_t offset = (off_t)arg6;
 
 	/* We only support the MAP_PRIVATE mode. */
 	if (!(flags & MAP_PRIVATE) || (flags & MAP_SHARED))
@@ -296,19 +282,14 @@ long __syscall_mmap(long arg1, ...)
 	return (long)addr;
 }
 
-long __syscall_mremap(long arg1, ...)
+long __syscall_mremap(long arg1, long arg2, long arg3,
+                      long arg4, long arg5, long arg6)
 {
-	void* old_addr, * new_addr;
-	size_t old_length, new_length;
-	int flags;
-	va_list va;
-
-	old_addr = (void*)arg1;
-	va_start(va, arg1);
-	old_length = (size_t)va_arg(va, long);
-	new_length = (size_t)va_arg(va, long);
-	flags = (int)va_arg(va, long);
-	va_end(va);
+	void* old_addr = (void*)arg1;
+	void* new_addr;
+	size_t old_length = (size_t)arg2;
+	size_t new_length = (size_t)arg3;
+	int flags = (int)arg4;
 
 	/*
 	 * Flags we support:
@@ -331,7 +312,7 @@ long __syscall_mremap(long arg1, ...)
 
 	if (new_length < old_length) {
 		long rv = __syscall_munmap((long)((char*)old_addr + new_length),
-		                           old_length - new_length);
+		                           old_length - new_length, 0, 0, 0, 0);
 		return rv == 0 ? (long)old_addr : rv;
 	}
 
@@ -387,16 +368,11 @@ long __syscall_mremap(long arg1, ...)
 	return (long)new_addr;
 }
 
-long __syscall_munmap(long arg1, ...)
+long __syscall_munmap(long arg1, long arg2, long arg3,
+                      long arg4, long arg5, long arg6)
 {
-	void* addr;
-	size_t length;
-	va_list va;
-
-	addr = (void*)arg1;
-	va_start(va, arg1);
-	length = (size_t)va_arg(va, long);
-	va_end(va);
+	void* addr = (void*)arg1;
+	size_t length = (size_t)arg2;
 
 	if (length > MAX_ADDRESS || length == 0)
 		return -EINVAL;
