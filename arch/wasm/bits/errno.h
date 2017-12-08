@@ -1,3 +1,10 @@
+// Wasm has its own errno.h, so that we can provide ELAST.  On other (Linux)
+// platforms, a newer kernel syscall may provide errno values that musl doesn't
+// know about, so it's hard to define a safe value.  libcxx (libc++) has a
+// hardcoded value of 4096 if ELAST is not provided, but only on Linux - other
+// platforms need to provide ELAST with libcxx currently.
+#define ELAST           4096
+
 #define EPERM            1
 #define ENOENT           2
 #define ESRCH            3
@@ -133,9 +140,3 @@
 #define ERFKILL         132
 #define EHWPOISON       133
 
-// Wasm copies the errno values, so that we can provide ELAST.  On other (Linux)
-// platforms, a newer kernel syscall may provide errno values that musl doesn't
-// know about, so it's hard to define a safe value.  libcxx (libc++) has a
-// hardcoded value of 4096 if ELAST is not provided, but only on Linux - other
-// plats need to provide ELAST with libcxx currently.
-#define ELAST           4096
