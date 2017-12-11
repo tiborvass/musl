@@ -10,6 +10,6 @@ struct wasm_init_data_t {
 	const char* envp0;
 	size_t aux[2*5];
 };
-extern struct wasm_init_data_t wasm_init_data;
+extern struct wasm_init_data_t __wasm_init_data;
 
 #endif

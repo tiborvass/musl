@@ -5,7 +5,7 @@
 
 static const char* const progname = "/a.out";
 
-struct wasm_init_data_t wasm_init_data = {
+struct wasm_init_data_t __wasm_init_data = {
 	.argc = 1,
 	.argv0 = progname,
 	.argv1 = 0,
