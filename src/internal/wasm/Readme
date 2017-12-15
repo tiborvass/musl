@@ -49,10 +49,3 @@ environment within a browser.
 This assumes that the hosting environment and the C application are developed
 together; or, that the C environment is written according to the known
 capabilities of a target hosting environment.
-
-### Details
-
-* Due to the type-safe nature of Wasm linkage, syscalls cannot actually be
-  variadic if defined externally.  Any syscalls called with a variable argument
-  count, and not provided here by Musl, could be fixed on a case-by-case basis
-  as needed.
