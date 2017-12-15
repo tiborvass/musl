@@ -259,7 +259,7 @@ __syscall_setrlimit
 __syscall_set_robust_list
 __syscall_setsid
 __syscall_setsockopt
-__syscall_set_tid_address
+#__syscall_set_tid_address
 __syscall_settimeofday
 __syscall_setuid
 __syscall_setxattr
