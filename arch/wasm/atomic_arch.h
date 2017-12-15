@@ -70,5 +70,5 @@ static inline void a_barrier()
 static inline void a_crash()
 {
 	// This generates the Wasm "unreachable" instruction which traps when reached
-	__builtin_unreachable();
+	__builtin_trap();
 }

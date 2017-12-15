@@ -23,7 +23,7 @@ long __syscall_futex(long arg1, long arg2, long arg3,
 		if (*addr == val) {
 			// trap, Wasm can't block
 			// TODO use a WebAssembly futex builtin, when those arrive!
-			__builtin_unreachable();
+			__builtin_trap();
 		}
 		return 0;
 	}
