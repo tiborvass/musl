@@ -1,12 +1,4 @@
-#ifndef SHARED
-
-#include <wasm/wasm_init_data.h>
-
-extern void _start_c(long* p);
-void _start(void)
-{
-	_start_c(&__wasm_init_data.argc);
-}
-
-#endif
+// A dummy file for Wasm - no dynamic linker support yet, and static
+// linking is handled via @llvm.global.ctor initialisation, rather
+// than having libc provide the entrypoint.
 

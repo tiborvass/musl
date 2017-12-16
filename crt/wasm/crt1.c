@@ -1,11 +1,10 @@
 #include <wasm/wasm_init_data.h>
 
-extern void __libc_start_init(void);
 extern void __init_libc(char **envp, char *pn);
 
-__attribute__((visibility("default")))
-void _start_wasm()
+// Perform libc initialisation at the highest priority
+__attribute__((constructor(1)))
+void __libc_ctor()
 {
 	__init_libc((char**)&__wasm_init_data.envp0, (char*)__wasm_init_data.argv0);
-	__libc_start_init();
 }
