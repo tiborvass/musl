@@ -42,13 +42,13 @@ static volatile int mmap_lock[2];
 static uint64_t used_pages[BITMAP_ELTS];
 
 static int heap_inited;
-static uintptr_t heap_bottom;
-static const uintptr_t dummy_heap_bottom;
-weak_alias(dummy_heap_bottom, __heap_bottom); // XXX See https://bugs.llvm.org/show_bug.cgi?id=35544
+static uintptr_t heap_base;
+static const uintptr_t dummy_heap_base;
+weak_alias(dummy_heap_base, __heap_base);
 
 
 /* For all these, the arguments are page-aligned and the lock is held. */
-static void initialize_heap_bottom(void);
+static void initialize_heap_base(void);
 static int increase_heap_to(void* end_addr);
 static uintptr_t used_pages_test_range(void* addr, size_t length, int set);
 static int used_pages_hunt_range(void** addr, size_t length);
@@ -58,22 +58,22 @@ static int used_pages_test_mapped(void* addr, size_t length);
 
 /* Check whether we've previously looked for the heap bottom, and
  * initialise it to the current process brk if not. */
-static void initialize_heap_bottom(void)
+static void initialize_heap_base(void)
 {
 	if (heap_inited)
 		return;
 
-	/* Find out the heap's position from the special __heap_bottom symbol if it
+	/* Find out the heap's position from the special __heap_base symbol if it
 	 * was given to us, or start from the current memory position otherwise. */
-	heap_bottom = __heap_bottom;
-	if (!heap_bottom) {
+	heap_base = __heap_base;
+	if (!heap_base) {
 		unsigned long pages = __builtin_wasm_current_memory();
-		heap_bottom = (uintptr_t)((pages ? pages : 1) * WASM_PAGE_SIZE);
+		heap_base = (uintptr_t)((pages ? pages : 1) * WASM_PAGE_SIZE);
 	}
-	heap_bottom = (heap_bottom + PAGE_MASK) & ~PAGE_MASK;
+	heap_base = (heap_base + PAGE_MASK) & ~PAGE_MASK;
 
 	/* Now allocate those pages so mmap() won't stomp on them. */
-	used_pages_toggle_range(0, heap_bottom);
+	used_pages_toggle_range(0, heap_base);
 	heap_inited = 1;
 }
 
@@ -170,8 +170,8 @@ static int used_pages_test_mapped(void* addr, size_t length)
 {
 	/* Check that the memory was allocated by mmap(), so we don't allow
 	 * someone to make us mark it as available! */
-	initialize_heap_bottom();
-	if ((uintptr_t)addr < heap_bottom)
+	initialize_heap_base();
+	if ((uintptr_t)addr < heap_base)
 		return 0;
 
 	if (used_pages_test_range(addr, length, 1) != UINTPTR_MAX)
@@ -254,7 +254,7 @@ long __syscall_mmap(long arg1, long arg2, long arg3,
 
 	LOCK(mmap_lock);
 
-	initialize_heap_bottom();
+	initialize_heap_base();
 
 	if (flags & MAP_FIXED) {
 		if (used_pages_test_range(addr, length, 0) != UINTPTR_MAX) {
