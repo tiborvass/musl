@@ -43,8 +43,7 @@ static uint64_t used_pages[BITMAP_ELTS];
 
 static int heap_inited;
 static uintptr_t heap_base;
-static const uintptr_t dummy_heap_base;
-weak_alias(dummy_heap_base, __heap_base);
+extern const uintptr_t __heap_base __attribute__((weak));
 
 
 /* For all these, the arguments are page-aligned and the lock is held. */
@@ -65,7 +64,7 @@ static void initialize_heap_base(void)
 
 	/* Find out the heap's position from the special __heap_base symbol if it
 	 * was given to us, or start from the current memory position otherwise. */
-	heap_base = __heap_base;
+	heap_base = (uintptr_t)&__heap_base;
 	if (!heap_base) {
 		unsigned long pages = __builtin_wasm_current_memory();
 		heap_base = (uintptr_t)((pages ? pages : 1) * WASM_PAGE_SIZE);
