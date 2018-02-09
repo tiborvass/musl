@@ -8,8 +8,8 @@ struct wasm_init_data_t {
 	const char* argv0;
 	const char* argv1;
 	const char* envp0;
-	size_t aux[2*5];
+	/* Following data matches: size_t aux[]; */
 };
-extern struct wasm_init_data_t __wasm_init_data;
+const struct wasm_init_data_t *__wasm_get_init_data(void);
 
 #endif

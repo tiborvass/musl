@@ -13,5 +13,6 @@ extern void __init_libc(char **envp, char *pn);
 __attribute__((constructor(1)))
 void __libc_ctor()
 {
-	__init_libc((char**)&__wasm_init_data.envp0, (char*)__wasm_init_data.argv0);
+	const struct wasm_init_data_t *init_data = __wasm_get_init_data();
+	__init_libc((char**)&init_data->envp0, (char*)init_data->argv0);
 }
