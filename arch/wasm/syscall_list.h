@@ -1,6 +1,8 @@
 // The list of syscalls is taken from x32, which contains a sensible list of
 // "modern" syscalls.
 
+// Removed: ioperm, iopl (x86-specific)
+
 SYSCALL_ACTION(accept4)
 SYSCALL_ACTION(accept)
 SYSCALL_ACTION(access)
@@ -108,8 +110,6 @@ SYSCALL_ACTION(io_cancel)
 SYSCALL_ACTION(ioctl)
 SYSCALL_ACTION(io_destroy)
 SYSCALL_ACTION(io_getevents)
-SYSCALL_ACTION(ioperm)
-SYSCALL_ACTION(iopl)
 SYSCALL_ACTION(ioprio_get)
 SYSCALL_ACTION(ioprio_set)
 SYSCALL_ACTION(io_setup)

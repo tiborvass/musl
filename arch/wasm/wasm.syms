@@ -108,8 +108,6 @@ __syscall_io_cancel
 __syscall_ioctl
 __syscall_io_destroy
 __syscall_io_getevents
-__syscall_ioperm
-__syscall_iopl
 __syscall_ioprio_get
 __syscall_ioprio_set
 __syscall_io_setup
