@@ -66,7 +66,7 @@ static void initialize_heap_base(void)
 	 * was given to us, or start from the current memory position otherwise. */
 	heap_base = (uintptr_t)&__heap_base;
 	if (!heap_base) {
-		unsigned long pages = __builtin_wasm_current_memory();
+		unsigned long pages = __builtin_wasm_memory_size(0);
 		heap_base = (uintptr_t)((pages ? pages : 1) * WASM_PAGE_SIZE);
 	}
 	heap_base = (heap_base + PAGE_MASK) & ~PAGE_MASK;
@@ -83,7 +83,7 @@ static int increase_heap_to(void* end_addr)
 	unsigned long old_pages, new_pages;
 	uintptr_t old_heap_top;
 
-	old_pages = __builtin_wasm_current_memory();
+	old_pages = __builtin_wasm_memory_size(0);
 	old_heap_top = old_pages * WASM_PAGE_SIZE;
 
 	if ((uintptr_t)end_addr <= old_heap_top)
@@ -93,7 +93,7 @@ static int increase_heap_to(void* end_addr)
 	if ((uintptr_t)end_addr & WASM_PAGE_MASK)
 		++new_pages; /* Pedantic rounding up avoiding addition overflow */
 
-	if (__builtin_wasm_grow_memory(new_pages - old_pages) == (unsigned long)-1)
+	if (__builtin_wasm_memory_grow(0, new_pages - old_pages) == (unsigned long)-1)
 		return 0;
 
 	return 1;
